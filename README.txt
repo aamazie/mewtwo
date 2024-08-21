@@ -16,13 +16,13 @@ Compile the Script:
 Use rustc to compile the script:
 bash
 Copy code
-rustc rat_scanner.rs -o rat_scanner
+rustc mewtwo.rs -o mewtwo
 Run the Script:
 
 Execute the compiled binary, passing the file or directory you want to scan:
 bash
 Copy code
-./rat_scanner /path/to/directory
+./mewtwo /path/to/directory
 Additional Notes:
 Error Handling: The script includes basic error handling to manage file read errors and decoding issues.
 Signature Database: You can expand the known_rat_signatures vector with more bytecode patterns relevant to the RATs you are targeting.
