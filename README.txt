@@ -1,3 +1,29 @@
+#Rust Malware Scanner, MEWTWO
+
+
+Implementing the Permissions Setup:
+
+To set up permissions statically:
+
+Linux:
+
+Run the scanner with sudo:
+
+sudo ./scanner_program
+
+Or set the binary with the setuid bit (not generally recommended for security reasons):
+
+sudo chown root:root scanner_program
+
+sudo chmod u+s scanner_program
+
+Windows:
+
+Run the program as Administrator.
+
+Use a task scheduler to run the program with elevated privileges.
+
+
 Key Improvements in the Rust Version
 
 Memory Safety:
