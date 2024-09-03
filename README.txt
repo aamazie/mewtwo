@@ -1,6 +1,9 @@
 #Rust Malware Scanner, MEWTWO
 
 
+Malware Scanner in Memory-Safe Rust for Buffer Overflow and RAT Detection and Prevention
+
+
 Implementing the Permissions Setup:
 
 To set up permissions statically:
