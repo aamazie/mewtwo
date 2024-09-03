@@ -67,5 +67,3 @@ Customization: Adjust the encoding/decoding logic as needed for the specific fir
 
 This Rust script provides a robust way to scan files or directories for hidden RATs by checking for known signatures within bytecode, and it can be easily expanded or integrated with other analysis tools.
 
-
-DISCLAIMER: This code is meant as a conceptual solution and please review the code in order to address issues on your own system.
