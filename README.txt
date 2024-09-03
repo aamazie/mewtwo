@@ -13,9 +13,9 @@ sudo ./mewtwo.rs
 
 Or set the binary with the setuid bit (not generally recommended for security reasons):
 
-sudo chown root:root scanner_program
+sudo chown root:root mewtwo.rs
 
-sudo chmod u+s scanner_program
+sudo chmod u+s mewtwo.rs
 
 Windows:
 
@@ -69,7 +69,7 @@ Efficient Directory Scanning: The script recursively scans through directories, 
 How to Compile and Run:
 Save the Script:
 
-Save the script as rat_scanner.rs.
+Save the script as mewtwo.rs.
 
 Compile the Script:
 
@@ -80,13 +80,4 @@ rustc mewtwo.rs -o mewtwo
 Run the Script:
 sudo ./mewtwo.rs
 
-Additional Notes:
-
-Error Handling: The script includes basic error handling to manage file read errors and decoding issues.
-
-Signature Database: You can expand the known_rat_signatures vector with more bytecode patterns relevant to the RATs you are targeting.
-
-Customization: Adjust the encoding/decoding logic as needed for the specific firmware or binary formats you're dealing with.
-
-This Rust script provides a robust way to scan files or directories for hidden RATs by checking for known signatures within bytecode, and it can be easily expanded or integrated with other analysis tools.
 
