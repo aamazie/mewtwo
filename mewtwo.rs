@@ -1,4 +1,5 @@
 use std::mem;
+use std::process;
 
 // Define malware signatures (simplified for demonstration purposes)
 const MALWARE_SIGNATURES: [&[u8]; 5] = [
@@ -31,7 +32,7 @@ fn check_stack_overflow(stack_canary: u32) {
     const STACK_CANARY: u32 = 0xDEADC0DE;
     if stack_canary != STACK_CANARY {
         eprintln!("Stack overflow detected! Halting execution...");
-        std::process::exit(1);
+        process::exit(1);
     }
 }
 
@@ -49,9 +50,11 @@ fn main() {
     check_stack_overflow(stack_canary);
 
     // Scan memory for malware signatures
-    match scan_for_malware(&memory_space) {
-        Some(_) => println!("Malware detected in memory!"),
-        None => println!("No malware detected."),
+    if let Some(_) = scan_for_malware(&memory_space) {
+        println!("Malware detected in memory! Terminating process to prevent damage...");
+        process::exit(1);
+    } else {
+        println!("No malware detected.");
     }
 
     // Final check for stack overflow after scanning
