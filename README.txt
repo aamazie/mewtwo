@@ -9,7 +9,7 @@ Linux:
 
 Run the scanner with sudo:
 
-sudo ./scanner_program
+sudo ./mewtwo.rs
 
 Or set the binary with the setuid bit (not generally recommended for security reasons):
 
@@ -78,10 +78,7 @@ Use rustc to compile the script:
 rustc mewtwo.rs -o mewtwo
 
 Run the Script:
-
-Execute the compiled binary, passing the file or directory you want to scan:
-
-./mewtwo /path/to/directory
+sudo ./mewtwo.rs
 
 Additional Notes:
 
