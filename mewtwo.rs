@@ -1,7 +1,8 @@
-use std::mem;
-use std::process;
+use std::fs::File;
+use std::io::{self, Read};
+use std::path::Path;
 
-// Define malware signatures (simplified for demonstration purposes)
+// Example malware signatures (simplified for demonstration)
 const MALWARE_SIGNATURES: [&[u8]; 5] = [
     b"\x60\x89\xe5\x31\xc0\x31\xdb\x31\xc9\x31\xd2", // Example shellcode signature
     b"\xeb\xfe",                                     // Infinite loop, common in shellcode
@@ -10,53 +11,49 @@ const MALWARE_SIGNATURES: [&[u8]; 5] = [
     b"\x6a\x02\x58\xcd\x80",                         // Syscall payload
 ];
 
-// Function to check for malware signatures in a memory slice
-fn scan_for_malware(memory: &[u8]) -> Option<usize> {
-    for (i, window) in memory.windows(10).enumerate() {
-        for (j, &signature) in MALWARE_SIGNATURES.iter().enumerate() {
+// Function to read a file into memory
+fn read_file_to_memory<P: AsRef<Path>>(path: P) -> io::Result<Vec<u8>> {
+    let mut file = File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
+}
+
+// Function to scan memory for malware signatures
+fn scan_for_malware(memory: &[u8]) -> bool {
+    for (i, window) in memory.windows(16).enumerate() {
+        for (j, signature) in MALWARE_SIGNATURES.iter().enumerate() {
             if window.starts_with(signature) {
                 println!(
                     "Malware detected: Signature {} found at memory address {:p}",
-                    j,
-                    &memory[i] as *const u8
+                    j, &memory[i]
                 );
-                return Some(j);
+                return true;  // Malware found
             }
         }
     }
-    None
-}
-
-// Function to simulate stack canary checks
-fn check_stack_overflow(stack_canary: u32) {
-    const STACK_CANARY: u32 = 0xDEADC0DE;
-    if stack_canary != STACK_CANARY {
-        eprintln!("Stack overflow detected! Halting execution...");
-        process::exit(1);
-    }
+    false  // No malware found
 }
 
 fn main() {
-    // Example memory space to scan (this would typically be your program or system memory)
-    let mut memory_space = vec![0u8; 1024];
-
-    // Simulate writing malware signature to memory for detection demonstration
-    memory_space[512..522].copy_from_slice(b"\x60\x89\xe5\x31\xc0\x31\xdb\x31\xc9\x31\xd2");
-
-    // Set up stack canary
-    let stack_canary: u32 = 0xDEADC0DE;
-
-    // Check for stack overflow before scanning
-    check_stack_overflow(stack_canary);
-
-    // Scan memory for malware signatures
-    if let Some(_) = scan_for_malware(&memory_space) {
-        println!("Malware detected in memory! Terminating process to prevent damage...");
-        process::exit(1);
-    } else {
-        println!("No malware detected.");
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 2 {
+        eprintln!("Usage: {} <filename>", args[0]);
+        return;
     }
 
-    // Final check for stack overflow after scanning
-    check_stack_overflow(stack_canary);
+    let file_path = &args[1];
+    let memory = match read_file_to_memory(file_path) {
+        Ok(data) => data,
+        Err(e) => {
+            eprintln!("Failed to read file: {}", e);
+            return;
+        }
+    };
+
+    if scan_for_malware(&memory) {
+        println!("Malware detected in file!");
+    } else {
+        println!("No malware detected in file.");
+    }
 }
