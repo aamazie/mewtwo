@@ -62,9 +62,7 @@ Bytecode Decoding and Encoding: The script decodes and encodes bytecode using he
 
 RAT Signature Scanning: The script checks for multiple known RAT signatures, including shellcode, infinite loops, NOP sleds, INT3 instructions, and syscall payloads.
 
-CLI Parameters and Directory Traversal: The script supports a command-line interface that allows for full traversal of directories, scanning each file for RATs.
-
-Efficient Directory Scanning: The script recursively scans through directories, analyzing all files it encounters.
+Process Memory: Code attempts to open and read the memory of other processes via the /proc/{pid}/mem files. On most Linux systems, reading these files directly is restricted to the process owner (usually root).
 
 How to Compile and Run:
 Save the Script:
