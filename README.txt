@@ -49,6 +49,16 @@ No Unsafe Code:
 
 The code avoids using Rust's unsafe keyword, adhering strictly to safe Rust practices.
 
+
+To run this code, you would need to add sysinfo to your Cargo.toml:
+
+toml
+Copy code
+[dependencies]
+sysinfo = "0.25.1"
+
+
+
 Benefits of Using Rust
 
 Memory Safety: Rust's compiler checks for potential memory safety issues at compile time, reducing the likelihood of runtime errors related to memory management. 
