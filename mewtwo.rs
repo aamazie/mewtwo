@@ -1,71 +1,72 @@
-use std::fs::{File, read_dir};
-use std::io::{self, Read};
-use std::process;
-use std::path::Path;
+use std::process::{exit};
+use sysinfo::{System, SystemExt};
 
+// Example malware signatures
 const MALWARE_SIGNATURES: [&[u8]; 5] = [
-    b"\x60\x89\xe5\x31\xc0\x31\xdb\x31\xc9\x31\xd2", // Example shellcode signature
-    b"\xeb\xfe",                                     // Infinite loop, common in shellcode
-    b"\x90\x90\x90\x90",                              // NOP sled, often used in exploits
-    b"\xcc\xcc\xcc\xcc",                              // INT3 instructions, potential breakpoint traps
-    b"\x6a\x02\x58\xcd\x80",                          // Syscall payload
+    b"\x60\x89\xe5\x31\xc0\x31\xdb\x31\xc9\x31\xd2",
+    b"\xeb\xfe",
+    b"\x90\x90\x90\x90",
+    b"\xcc\xcc\xcc\xcc",
+    b"\x6a\x02\x58\xcd\x80",
 ];
 
-const BUFFER_SIZE: usize = 1024;
 const STACK_CANARY: u32 = 0xDEADC0DE;
 
-fn check_stack_overflow(canary: u32) {
-    if canary != STACK_CANARY {
-        println!("Stack overflow detected! Halting execution...");
-        process::exit(1);
+// Function to get dynamic buffer size
+fn get_dynamic_buffer_size() -> usize {
+    let sys = System::new_all();
+    let total_memory = sys.total_memory(); // Total memory in KB
+
+    // Example heuristic: Use 1% of total memory as buffer size
+    (total_memory * 1024 / 100) as usize
+}
+
+// Function to check for stack overflow
+fn check_stack_overflow(stack_canary: u32) {
+    if stack_canary != STACK_CANARY {
+        println!("Stack overflow detected! Terminating process...");
+        exit(1);
     }
 }
 
-fn scan_for_malware(file: &mut File) -> io::Result<bool> {
-    let mut buffer = [0u8; BUFFER_SIZE];
+// Function to scan memory for malware signatures
+fn scan_for_malware(memory: &[u8]) -> bool {
+    for i in 0..memory.len() {
+        for (j, &signature) in MALWARE_SIGNATURES.iter().enumerate() {
+            if memory[i..].starts_with(signature) {
+                println!(
+                    "Malware detected: Signature {} found at memory offset {}",
+                    j, i
+                );
 
-    while let Ok(bytes_read) = file.read(&mut buffer) {
-        if bytes_read == 0 {
-            break;
-        }
-
-        for i in 0..bytes_read {
-            for (j, signature) in MALWARE_SIGNATURES.iter().enumerate() {
-                if i + signature.len() <= bytes_read && buffer[i..i + signature.len()] == *signature {
-                    println!("Malware detected: Signature {} found", j);
-                    return Ok(true);
-                }
+                // Terminate the malicious process if detected
+                terminate_malicious_process();
+                return true;
             }
         }
     }
-
-    Ok(false)
+    false
 }
 
-fn is_numeric(s: &str) -> bool {
-    s.chars().all(|c| c.is_digit(10))
+// Function to terminate the malicious process
+fn terminate_malicious_process() {
+    println!("Terminating malicious process...");
+    exit(1);
 }
 
-fn main() -> io::Result<()> {
-    let proc_path = Path::new("/proc");
-    let entries = read_dir(proc_path)?;
+fn main() {
+    let buffer_size = get_dynamic_buffer_size();
+    let mut memory_space: Vec<u8> = vec![0; buffer_size];
 
-    for entry in entries {
-        if let Ok(entry) = entry {
-            let pid = entry.file_name();
-            if let Some(pid_str) = pid.to_str() {
-                if is_numeric(pid_str) {
-                    let mem_path = format!("/proc/{}/mem", pid_str);
-                    if let Ok(mut file) = File::open(mem_path) {
-                        if scan_for_malware(&mut file)? {
-                            println!("Malware detected in process: {}", pid_str);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+    // Simulate scanning memory space
+    let stack_canary = STACK_CANARY;
+    check_stack_overflow(stack_canary);
+
+    if scan_for_malware(&memory_space) {
+        println!("Malware detected in memory!");
+    } else {
+        println!("No malware detected.");
     }
 
-    Ok(())
+    check_stack_overflow(stack_canary);
 }
