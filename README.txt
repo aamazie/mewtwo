@@ -1,8 +1,9 @@
 #Rust Malware Scanner, MEWTWO
 
 
-Malware Scanner in Memory-Safe Rust for Buffer Overflow and RAT Detection and Prevention
+Malware Scanner in Memory-Safe Rust for Buffer Overflow (NOP Sled) and RAT Detection and Prevention
 
+NOP Sleds are effective ways to inject RATs and other malware. See the Malware Signatures list in the program to add your own signatures or to lengthen or shorten the NOP Sled.
 
 Implementing the Permissions Setup:
 
